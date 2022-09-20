@@ -13,20 +13,15 @@ public class CommonConfig implements ApplicationContextAware {
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        // 获取RabbitTemplate对象
         RabbitTemplate rabbitTemplate = applicationContext.getBean(RabbitTemplate.class);
-        // 配置ReturnCallback
         rabbitTemplate.setReturnCallback((message, replyCode, replyText, exchange, routingKey) -> {
-            // 判断是否是延迟消息
-            Integer receivedDelay = message.getMessageProperties().getReceivedDelay();
-            if (receivedDelay != null && receivedDelay > 0) {
-                // 是一个延迟消息，忽略这个错误提示
+            //判断是否延时消息
+            if (message.getMessageProperties().getReceivedDelay() > 0) {
                 return;
             }
-            // 记录日志
-            log.error("消息发送到队列失败，响应码：{}, 失败原因：{}, 交换机: {}, 路由key：{}, 消息: {}",
-                     replyCode, replyText, exchange, routingKey, message.toString());
-            // 如果有需要的话，重发消息
+            log.error("消息发送到队列失败，应答码:{}，原因:{}，交换机:{}，路由key:{}，消息:{}",
+                    replyCode,replyText,exchange,routingKey,message.toString());
+        //    有需要可对消息进行重发
         });
     }
 }

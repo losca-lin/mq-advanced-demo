@@ -25,7 +25,7 @@ public class SpringAmqpTest {
     @Test
     public void testSendMessage2SimpleQueue() throws InterruptedException {
         // 1.准备消息
-        String message = "hello, spring amqp!";
+        String message = "hello, spring aaa!";
         // 2.准备CorrelationData
         // 2.1.消息ID
         CorrelationData correlationData = new CorrelationData(UUID.randomUUID().toString());
@@ -46,7 +46,7 @@ public class SpringAmqpTest {
             // 重发消息
         });
         // 3.发送消息
-        rabbitTemplate.convertAndSend("amq.topic", "a.simple.test", message, correlationData);
+        rabbitTemplate.convertAndSend("amq.topic", "simple.test", message, correlationData);
     }
 
     @Test
@@ -77,22 +77,21 @@ public class SpringAmqpTest {
     public void testSendDelayMessage() throws InterruptedException {
         // 1.准备消息
         Message message = MessageBuilder
-                .withBody("hello, ttl messsage".getBytes(StandardCharsets.UTF_8))
+                .withBody("hello, delay messsage".getBytes(StandardCharsets.UTF_8))
                 .setDeliveryMode(MessageDeliveryMode.PERSISTENT)
-                .setHeader("x-delay", 5000)
+                .setHeader("x-delay",5000)
                 .build();
         // 2.准备CorrelationData
         CorrelationData correlationData = new CorrelationData(UUID.randomUUID().toString());
         // 3.发送消息
         rabbitTemplate.convertAndSend("delay.direct", "delay", message, correlationData);
-
         log.info("发送消息成功");
     }
 
     @Test
     public void testLazyQueue() throws InterruptedException {
         long b = System.nanoTime();
-        for (int i = 0; i < 1000000; i++) {
+        for (int i = 0; i < 100_0000; i++) {
             // 1.准备消息
             Message message = MessageBuilder
                     .withBody("hello, Spring".getBytes(StandardCharsets.UTF_8))
